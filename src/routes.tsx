@@ -1,37 +1,40 @@
-import Home from '@/views/home';
+import ProtectedRoute from '@/layouts/ProtectedRoute';
 import IPManage from '@/views/ip-manage';
 import Audit from '@/views/audit';
+import SignIn from '@/views/signin';
+import SignUp from '@/views/signup';
 
 const routes = [
   {
     path: "/",
-    name: "Home",
+    name: "Root",
     primary: true,
-    element: <Home />,
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "ip-manage",
+        name: "IP Manage",
+        element: <IPManage />,
+      },
+      {
+        path: "audit",
+        name: "Audit",
+        element: <Audit />,
+      },
+    ],
   },
+  
   {
-    path: "/ip-manage",
-    name: "IP Manage",
-    primary: true,
-    element: <IPManage />,
-  },
-  {
-    path: "/audit",
-    name: "Audit",
-    primary: true,
-    element: <Audit />,
-  },
-  {
-    path: "/signin",
+    path: "/sign-in",
     name: "Sign In",
     primary: false,
-    element: <Home />,
+    element: <SignIn />,
   },
   {
-    path: "/signup",
+    path: "/sign-up",
     name: "Sign Up",
     primary: false,
-    element: <Home />,
+    element: <SignUp />,
   },
 ]
 

@@ -6,7 +6,6 @@ import {
   Button,
   Stack,
   Collapse,
-  Icon,
   useColorModeValue,
   useBreakpointValue,
   useDisclosure,
@@ -14,12 +13,19 @@ import {
 import {
   HamburgerIcon,
   CloseIcon,
-  ChevronDownIcon,
 } from '@chakra-ui/icons'
 import routes from '@/routes'
+import { useAuth } from '@/contexts/AuthProvider';
 
 export default function Header() {
   const { isOpen, onToggle } = useDisclosure()
+  const auth = useAuth();
+
+  const menuItems = routes.filter(route => route.primary && route.children).map(route => route.children).flat();
+  const handleLogout = () => {
+    auth.logoutAuth();
+    return
+  }
 
   return (
     <Box>
@@ -56,7 +62,7 @@ export default function Header() {
             </Text>
 
             <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
-              <DesktopNav />
+              <DesktopNav menus={menuItems} />
             </Flex>
           </Flex>
           <Stack
@@ -64,40 +70,27 @@ export default function Header() {
             justify={'flex-end'}
             direction={'row'}
             spacing={6}>
-            <Button as={'a'} fontSize={'sm'} fontWeight={400} variant={'link'} href={'#'}>
-              Sign In
-            </Button>
-            <Button
-              as={'a'}
-              display={{ base: 'none', md: 'inline-flex' }}
-              fontSize={'sm'}
-              fontWeight={600}
-              color={'white'}
-              bg={'pink.400'}
-              href={'#'}
-              _hover={{
-                bg: 'pink.300',
-              }}>
-              Sign Up
+            <Button as={'a'} fontSize={'sm'} fontWeight={400} variant={'link'} onClick={handleLogout}>
+              Log Out
             </Button>
           </Stack>
         </Flex>
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
-        <MobileNav />
+        <MobileNav menus={menuItems} />
       </Collapse>
     </Box>
   )
 }
 
-const DesktopNav = () => {
+const DesktopNav = ({ menus }: any) => {
   const linkColor = useColorModeValue('gray.600', 'gray.200')
   const linkHoverColor = useColorModeValue('gray.800', 'white')
 
   return (
     <Stack direction={'row'} spacing={4} alignItems={'center'}>
-      {routes.map((route) => route.primary ? (
+      {menus.map((route: any) => (
         <Box key={route.name}>
           <Box
             as="a"
@@ -113,27 +106,26 @@ const DesktopNav = () => {
             {route.name}
           </Box>
         </Box>
-      ) : null
-    )}
+      )
+      )}
     </Stack>
   )
 }
 
-const MobileNav = () => {
+const MobileNav = ({ menus }: any) => {
   return (
     <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
-      {routes.map((route: any) => (
+      {menus.map((route: any) => (
         <MobileNavItem key={route.name} {...route} />
       ))}
     </Stack>
   )
 }
 
-const MobileNavItem = ({ name, path, primary }: any) => {
+const MobileNavItem = ({ name, path }: any) => {
 
   return (
     <>
-    {primary ? (
       <Stack spacing={4}>
         <Box
           py={2}
@@ -149,7 +141,6 @@ const MobileNavItem = ({ name, path, primary }: any) => {
           </Text>
         </Box>
       </Stack>
-    ) : null}
     </>
   )
 }
