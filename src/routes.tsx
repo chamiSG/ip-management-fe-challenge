@@ -3,6 +3,7 @@ import IPManage from '@/views/ip-manage';
 import Audit from '@/views/audit';
 import SignIn from '@/views/signin';
 import SignUp from '@/views/signup';
+import Home from './views/home';
 
 const routes = [
   {
@@ -11,6 +12,11 @@ const routes = [
     primary: true,
     element: <ProtectedRoute />,
     children: [
+      {
+        path: "/",
+        name: "Home",
+        element: <Home />,
+      },
       {
         path: "ip-manage",
         name: "IP Manage",
