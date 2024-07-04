@@ -1,5 +1,5 @@
 
 export const Status = {
-	USER: "USER",
+	LOGIN: "Login",
 	IP: "IP",
 }

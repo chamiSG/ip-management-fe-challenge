@@ -1,87 +1,104 @@
 import {
-    Box,
-    Button,
-    Flex,
-    Tooltip,
-    Table,
-    Tbody,
-    Td,
-    Text,
-    Th,
-    Thead,
-    Tr,
-    Divider,
-    useColorModeValue,
-    Badge,
-  } from "@chakra-ui/react";
-  import { Link } from "react-router-dom";
-  import {
-    createColumnHelper,
-    flexRender,
-    getCoreRowModel,
-    getSortedRowModel,
-    getPaginationRowModel,
-    useReactTable,
-  } from "@tanstack/react-table";
-  import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-  import { Status } from "@/types";
-  
-  const columnHelper = createColumnHelper<any>();
-  
-  const DataTable = (props: { data: any, cols: any }) => {
-    const { data, cols } = props;
-    const textColor = useColorModeValue("secondaryGray.900", "white");
-    const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
-  
-    const columns = cols?.map((col: any) => columnHelper.accessor(col.id, {
-      id: col.id,
-      header: () => (
-        <Text
-          justifyContent="space-between"
-          align="center"
-          fontSize={{ sm: "10px", lg: "12px" }}
-          color="gray.400"
-        >
-          {col.label}
-        </Text>
-      ),
-      cell: (info: any) => {
-        let variant = 'brand';
-        switch (info.getValue()) {
-          case Status.USER:
-            variant = 'success';
-            break;
-          case Status.IP:
-            variant = 'brand';
-            break;
-          default:
-            variant = 'brand';
+  Box,
+  Button,
+  Flex,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  Divider,
+  useColorModeValue,
+  Badge,
+} from "@chakra-ui/react";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { Status } from "@/types";
+import { formatDate } from "@/utils";
+
+const columnHelper = createColumnHelper<any>();
+
+const DataTable = (props: { data: any, cols: any, onChange?: (id: any) => void }) => {
+  const { data, cols, onChange } = props;
+  const textColor = useColorModeValue("secondaryGray.900", "white");
+  const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
+
+  const columns = cols?.map((col: any) => columnHelper.accessor(col.id, {
+    id: col.id,
+    header: () => (
+      <Text
+        justifyContent="space-between"
+        align="center"
+        fontSize={{ sm: "10px", lg: "12px" }}
+        color="gray.400"
+      >
+        {col.label}
+      </Text>
+    ),
+    cell: (info: any) => {
+      let variant = 'brand';
+      switch (info.getValue()) {
+        case Status.LOGIN:
+          variant = 'success';
+          break;
+        case Status.IP:
+          variant = 'brand';
+          break;
+        default:
+          variant = 'brand';
+      }
+      const parsingElement = (label: string) => {
+        if (label === "Type") {
+          return (
+            <Badge
+              variant={variant}
+              fontSize="sm"
+              fontWeight="500"
+              whiteSpace={"nowrap"}
+              textOverflow={"ellipsis"}
+              overflow={"hidden"}
+              width={"fit"}
+            >
+              {info.getValue()}
+            </Badge>
+          )
+        } else if (label === "Date") {
+          return (
+            <Text color={textColor} fontSize="sm" fontWeight="500" whiteSpace={'nowrap'} textOverflow={'ellipsis'} overflow={'hidden'} width={'full'}>
+              {formatDate(info.getValue())}
+            </Text>
+          )
+        } else if (label === "Edit" && onChange) {
+          return(
+            <Button variant={'brand'} onClick={() => onChange(info.getValue())}>
+              Edit
+            </Button>
+          )
+        } else {
+          return (
+            <Text color={textColor} fontSize="sm" fontWeight="500" whiteSpace={'nowrap'} textOverflow={'ellipsis'} overflow={'hidden'} width={'full'}>
+              {info.getValue()}
+            </Text>
+          )
         }
-        return (
-          <Flex align="center">
-            <Tooltip label={info.getValue()} aria-label='A tooltip'>
-              {col.label === "Status" ? (
-                <Badge
-                  variant={variant}
-                  fontSize="sm"
-                  fontWeight="500"
-                  whiteSpace={"nowrap"}
-                  textOverflow={"ellipsis"}
-                  overflow={"hidden"}
-                  width={"fit"}
-                >
-                  {info.getValue()}
-                </Badge>
-              ) : (
-                <Text color={textColor} fontSize="sm" fontWeight="500" whiteSpace={'nowrap'} textOverflow={'ellipsis'} overflow={'hidden'} width={'full'}>
-                  {info.getValue()}
-                </Text>
-              )}
-            </Tooltip>
-          </Flex>
-        )},
-    }))
-  
+      }
+      return (
+        <Flex align="center">
+          {parsingElement(col.label)}
+        </Flex>
+      )
+    },
+  }))
+
   const table = useReactTable({
     data: data,
     columns,
@@ -90,7 +107,7 @@ import {
     getPaginationRowModel: getPaginationRowModel(),
     debugTable: true,
   });
-  
+
   return (
     <Box>
       <Box overflow={'auto'}>
@@ -142,12 +159,10 @@ import {
                           minW={{ sm: "150px", md: "200px", lg: "auto" }}
                           borderColor="transparent"
                         >
-                          <Link to={`#`}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </Link>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
                         </Td>
                       );
                     })}
@@ -164,7 +179,7 @@ import {
           </Tbody>
         </Table>
       </Box>
-  
+
       <Divider orientation="horizontal" />
       <Flex justifyContent={"space-between"} px={5} pt={5}>
         <Flex w={"full"}>
@@ -206,6 +221,5 @@ import {
       </Flex>
     </Box>
   );
-  }
-  export default DataTable
-  
+}
+export default DataTable
